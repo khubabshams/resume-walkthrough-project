@@ -9,11 +9,11 @@ function userInformationHTML(user) {
         <p>Followers: ${user.followers} - Following: ${user.following} <br> Repos: ${user.public_repos}</p>
     </div>`
 }
-function repoInformationHTML(repos){
-    if(repos.length == 0){
+function repoInformationHTML(repos) {
+    if (repos.length == 0) {
         return `<div class="clearfix repo-list">No repos!</div>`
     }
-    let listItemsHTML = repos.map(function(repo){
+    let listItemsHTML = repos.map(function (repo) {
         return `<li>
                     <a href="${repo.html_url}" target="_blank">${repo.name}</a>
                 </li>`;
@@ -53,6 +53,9 @@ function fetchGitHubInformation(event) {
     }, function (errorResponse) {
         if (errorResponse.status === 404) {
             $("#gh-user-data").html(`<h2>No info found for user ${username}</h2>`);
+        } else if (errorResponse.status === 403) {
+            let resetTime = new Date(errorResponse.getResponseHeader('X-RateLimit-Reset') * 1000);
+            $("#gh-user-data").html(`<h4>Too many requests, please wait unitl ${resetTime.toLocaleTimeString()}</h4>`);
         } else {
             $("#gh-user-data").html(`<h2>Error: ${errorResponse.responseJSON.message}</h2>`);
         }
